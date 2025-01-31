@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row justify-content-center mb-3">
+        <div class="col-md-6">
+            <h2 class="text-center">Add New Category</h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <p class="message-text {% if category == 'success' %}text-success{% elif category == 'danger' %}text-danger{% elif category == 'warning' %}text-warning{% endif %} fw-bold">
+                    {{ message }}
+                </p>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+            <form method="POST" action="{{ url_for('add_category') }}" id="categoryForm" onsubmit="return validateForm()">
+                <div class="mb-3">
+                    <label for="category_name" class="form-label fw-bold">Category Name</label>
+                    <input type="text" class="form-control" id="category_name" name="category_name" required>
+                    <div id="categoryNameError" class="invalid-feedback" style="display: none;">
+                        Category Name is invalid. Only letters and numbers are allowed.
+                    </div>
+                    <small class="form-text text-muted">Only letters and numbers are allowed (no spaces or special characters)</small>
+                </div>
+                <div id="subcategories">
+                    <div class="mb-3">
+                        <label for="subcategory1" class="form-label fw-bold">Subcategory 1</label>
+                        <input type="text" class="form-control subcategory-input" name="subcategories[]" required>
+                        <div class="invalid-feedback">
+                            Subcategory Name is invalid. Only letters and numbers are allowed.
+                        </div>
+                        <small class="form-text text-muted">Only letters and numbers are allowed (no spaces or special characters)</small>
+                    </div>
+                </div>
+                <button type="button" class="btn custom-button-sm mb-5" id="addSubcategory">Add New Subcategory</button>
+                <div class="d-flex justify-content-center mt-3">
+                    <button type="submit" class="btn custom-button me-2">Submit</button>
+                    <a href="{{ url_for('log_waste') }}" class="btn custom-button ms-2">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function isValidName(name) {
+            const regex = /^[a-zA-Z0-9]+$/;
+            return regex.test(name);
+        }
+
+        document.getElementById('category_name').addEventListener('input', function() {
+            const isValid = isValidName(this.value);
+            this.classList.toggle('is-invalid', !isValid);
+            document.getElementById('categoryNameError').style.display = isValid ? 'none' : 'block';
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('subcategory-input')) {
+                const isValid = isValidName(e.target.value);
+                e.target.classList.toggle('is-invalid', !isValid);
+            }
+        });
+
+        function validateForm() {
+            let isValid = true;
+            const categoryName = document.getElementById('category_name').value;
+            const categoryNameError = document.getElementById('categoryNameError');
+            
+            if (!isValidName(categoryName)) {
+                categoryNameError.style.display = 'block';
+                document.getElementById('category_name').classList.add('is-invalid');
+                isValid = false;
+            } else {
+                categoryNameError.style.display = 'none';
+                document.getElementById('category_name').classList.remove('is-invalid');
+            }
+
+            const subcategoryInputs = document.getElementsByClassName('subcategory-input');
+            for (let input of subcategoryInputs) {
+                if (!isValidName(input.value)) {
+                    input.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            }
+
+            return isValid;
+        }
+
+        document.getElementById('addSubcategory').addEventListener('click', function() {
+            var subcategoriesDiv = document.getElementById('subcategories');
+            var newSubcategoryDiv = document.createElement('div');
+            newSubcategoryDiv.className = 'mb-3';
+            var newSubcategoryNumber = subcategoriesDiv.children.length + 1;
+            newSubcategoryDiv.innerHTML = `
+                <label for="subcategory${newSubcategoryNumber}" class="form-label fw-bold">Subcategory ${newSubcategoryNumber}</label>
+                <input type="text" class="form-control subcategory-input" name="subcategories[]" required>
+                <div class="invalid-feedback">
+                    Subcategory Name is invalid. Only letters and numbers are allowed.
+                </div>
+                <small class="form-text text-muted">Only letters and numbers are allowed (no spaces or special characters)</small>
+            `;
+            subcategoriesDiv.appendChild(newSubcategoryDiv);
+        });
+    </script>
+
+    <style>
+        .custom-button {
+            background-color: #6c757d;
+            color: #ffffff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        .custom-button-sm {
+            background-color: #007BFF;
+            color: #ffffff;
+            border: none;
+            padding: 0.3rem 0.75rem;
+            font-size: 0.9rem;
+            border-radius: 5px;
+        }
+
+        .custom-button-sm:hover {
+            background-color: #0056b3;
+        }
+
+        .custom-button:hover {
+            background-color: #5a5a5a;
+        }
+
+        .text-success {
+            color: #28a745; /* Green text for success */
+        }
+        .text-danger {
+            color: #dc3545; /* Red text for danger */
+        }
+        .text-warning {
+            color: #ffc107; /* Yellow text for warning */
+        }
+
+        /* Bold font style for message */
+        .fw-bold {
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}

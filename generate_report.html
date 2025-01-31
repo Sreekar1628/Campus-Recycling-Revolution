@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="text-center" style="margin-bottom: 2rem;">Generate Report</h2>
+
+<!-- Form for generating report with date range selection -->
+<form id="report-form" method="POST" action="/generate-report" style="max-width: 700px; margin: 0 auto;">
+    <div class="mb-4">
+        <label for="start_date" class="form-label fw-bold">Start Date</label>
+        <input type="date" class="form-control" id="start_date" name="start_date" required>
+    </div>
+    <div class="mb-4">
+        <label for="end_date" class="form-label fw-bold">End Date</label>
+        <input type="date" class="form-control" id="end_date" name="end_date" required>
+    </div>
+
+    <!-- Button layout with spacing between rows -->
+    <div class="row justify-content-center gx-2 gy-2 mt-3">
+        <div class="col-auto">
+            <button type="submit" class="btn btn-report-summary btn-wide">Report Summary</button>
+        </div>
+        <div class="col-auto">
+            <button type="button" onclick="generatePieChart()" class="btn btn-pie-chart btn-wide">Pie Chart</button>
+        </div>
+        <div class="col-auto">
+            <button type="button" onclick="generateMonthlyGraphs()" class="btn btn-monthly-graphs btn-wide">Monthly Graphs</button>
+        </div>
+    </div>
+    <div class="row justify-content-center gx-2 gy-2 mt-2">
+        <div class="col-auto">
+            <button type="button" onclick="downloadLandfillExpenses()" class="btn btn-landfill-expenses btn-wide">Landfill Expenses</button>
+        </div>
+        <div class="col-auto">
+            <button type="button" onclick="downloadRecyclingRevenue()" class="btn btn-recycling-revenue btn-wide">Recycling Revenue</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    // JavaScript to set the max date to today to prevent future date selection
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('start_date').setAttribute('max', today);
+    document.getElementById('end_date').setAttribute('max', today);
+
+    function generatePieChart() {
+        const startDate = document.getElementById("start_date").value;
+        const endDate = document.getElementById("end_date").value;
+        if (startDate && endDate) {
+            window.location.href = `/report/pie-chart?start_date=${startDate}&end_date=${endDate}`;
+        } else {
+            alert("Please select a start and end date.");
+        }
+    }
+
+    function generateMonthlyGraphs() {
+        const startDate = document.getElementById("start_date").value;
+        const endDate = document.getElementById("end_date").value;
+        if (startDate && endDate) {
+            window.location.href = `/report/monthly-waste-graphs?start_date=${startDate}&end_date=${endDate}`;
+        } else {
+            alert("Please select a start and end date.");
+        }
+    }
+
+    function downloadLandfillExpenses() {
+        const startDate = document.getElementById("start_date").value;
+        const endDate = document.getElementById("end_date").value;
+        if (startDate && endDate) {
+            window.location.href = `/download-landfill-expenses?start_date=${startDate}&end_date=${endDate}`;
+        } else {
+            alert("Please select a start and end date.");
+        }
+    }
+
+    function downloadRecyclingRevenue() {
+        const startDate = document.getElementById("start_date").value;
+        const endDate = document.getElementById("end_date").value;
+        if (startDate && endDate) {
+            window.location.href = `/download-recycling-revenue?start_date=${startDate}&end_date=${endDate}`;
+        } else {
+            alert("Please select a start and end date.");
+        }
+    }
+</script>
+
+<style>
+    .btn-wide {
+        width: 150px;
+        white-space: nowrap;
+    }
+    .form-control {
+        max-width: 700px;
+    }
+    .mb-4 {
+        margin-bottom: 2rem !important;
+    }
+
+    /* Custom button colors */
+    .btn-report-summary {
+        background-color: #ffb3b3; /* Light Pink */
+        color: #333333;
+        border: none;
+    }
+    .btn-report-summary:hover {
+        background-color: #ffc5c5;
+    }
+
+    .btn-pie-chart {
+        background-color: #99ddff; /* Light Blue */
+        color: #333333;
+        border: none;
+    }
+    .btn-pie-chart:hover {
+        background-color: #66ccff;
+    }
+
+    .btn-monthly-graphs {
+        background-color: #b3e6b3; /* Light Green */
+        color: #333333;
+        border: none;
+    }
+    .btn-monthly-graphs:hover {
+        background-color: #99cc99;
+    }
+
+    .btn-landfill-expenses {
+        background-color: #c8a2c8; /* Light Purple */
+        color: #333333;
+        border: none;
+    }
+    .btn-landfill-expenses:hover {
+        background-color: #d8b2d8;
+    }
+
+    .btn-recycling-revenue {
+        background-color: #ffccff; /* Light Pink */
+        color: #333333;
+        border: none;
+    }
+    .btn-recycling-revenue:hover {
+        background-color: #ff99ff;
+    }
+</style>
+{% endblock %}
